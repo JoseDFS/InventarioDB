@@ -166,17 +166,90 @@ public class Consulta extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 FiltroDao fd = new FiltroDao();
-                Filtro f = new Filtro(codigo.getText(), marca.getSelectedItem().toString(),Integer.parseInt(stock.getText()),true);  
-                
-                if(no.isSelected())
+                Filtro f = new Filtro(codigo.getText(), marca.getSelectedItem().toString(), Integer.parseInt(stock.getText()), true);
+
+                if (no.isSelected()) {
+                    f.setExistence(false);
+                }
+                if (fd.create(f)) {
+                    JOptionPane.showMessageDialog(null, "Filtro registrado con exito");
+                    limpiarCampos();
+                    llenarTabla();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Ocurrio un problema a la hora d emodificar el filtro");
+                }
+            }
+
+        });
+
+        eliminar.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                FiltroDao fd = new FiltroDao();
+
+                if (fd.delete(codigo.getText())) {
+                    JOptionPane.showMessageDialog(null, "Filtro eliminado con exito");
+                    limpiarCampos();
+                    llenarTabla();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Ocurrio un problema a la hora de eliminar el filtro");
+                }
+            }
+
+        });
+        
+        buscar.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                FiltroDao fd = new FiltroDao();
+                Filtro f = fd.read(codigo.getText());
+                if(f == null)
                     f.setExistence(false);
                 if(fd.create(f)){
-                    JOptionPane.showMessageDialog(null,"Filtro registradp con exito");
+                    JOptionPane.showMessageDialog(null,"El filtro buscado no se ha encontrado");
+                   
+                }
+                else{
+                    codigo.setText(f.getCodigo());
+                    marca.setSelectedItem(f.getMarca());
+                    stock.setText(Integer.toString(f.getStock()));
+                    
+                    if(f.isExistencia()){
+                        si.setSelected(true);
+                    }
+                    else{
+                        no.setSelected(false);
+                    }
                 }
             }
         
         });
         
+         insertar.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                limpiarCampos();
+            }
+        
+        });
+
     }
 
+    public void limpiarCampos() {
+        codigo.setText("");
+        marca.setSelectedItem("FRAM");
+        stock.setText("");
+    }
+
+    public static void main(String args) {
+        java.awt.EventQueue.invokeLater(new Runnable(){
+            @Override
+            public void run(){
+                new Consulta().setVisible(true);
+            }
+        });
+    }
 }
